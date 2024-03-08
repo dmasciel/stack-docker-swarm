@@ -1,0 +1,56 @@
+version: '3.7'
+services:
+  # Definição do Serviço do Qdrant
+  qdrant:
+    # imagem do qdrant 
+    image: qdrant/qdrant:latest
+    # configura a rede do serviço
+    networks:
+      - network_public    
+    # Configura as portas do serviço  
+    ports:
+      - "6333:6333"
+      - "6334:6334"    
+    # Configura o volume do serviço
+    volumes:
+      - qdrant_data:/qdrant_data    
+    deploy:
+      # Define o modo de deploy do serviço
+      mode: replicated
+      # Define a quantidade de réplicas do serviço
+      replicas: 1
+      # Define a estratégia de deploy do serviço
+      restart_policy:
+        condition: any
+      # Define a configuração do serviço
+      placement:
+        constraints:
+          # geralmente coloca ele do lado das aplicações e não no banco. no manager ele elimina latências para conectar no banco
+          - node.role == manager
+          # - node.hostname == worker1
+      resources:
+        # Define os limites de recursos do serviço
+        limits:
+          # Define o limite de CPU do serviço
+          cpus: "1"
+          # Define o limite de memória do serviço (aumentar ao longo do tempo pois ele utiliza bastante memória para otimizar)
+          memory: 1024M      
+
+    configs:
+      - source: qdrant_config
+        target: /qdrant/config/production.yaml
+
+
+configs:
+  qdrant_config:
+    file: ./qdrant_config.yaml
+
+volumes:
+  qdrant_data:
+    external: true
+    name: qdrant_data
+
+networks:
+  network_public:
+    external: true
+    name: network_public

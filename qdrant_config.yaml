@@ -1,0 +1,6 @@
+# Configuração personalizada para o Qdrant
+
+# Nível de log
+log_level: INFO
+
+# Configurações adicionais podem ser adicionadas conforme necessário
