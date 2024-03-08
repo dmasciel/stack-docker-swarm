@@ -34,12 +34,24 @@ services:
           # Define o limite de CPU do serviço
           cpus: "1"
           # Define o limite de memória do serviço (aumentar ao longo do tempo pois ele utiliza bastante memória para otimizar)
-          memory: 1024M      
+          memory: 1024M 
+      labels:
+        # Habilita o traefik para o serviço
+        - traefik.enable=true
+        # Define o dominio do qdrant
+        - traefik.http.routers.qdrant.rule=Host(`qdrant.seudominio.com.br`)
+        # Define o tipo de entrada do qdrant para HTTPS
+        - traefik.http.routers.qdrant.entrypoints=websecure
+        # Define o certificado do qdrant
+        - traefik.http.routers.qdrant.tls.certresolver=letsencryptresolver
+        # Define a porta do serviço no traefik
+        - traefik.http.services.qdrant.loadBalancer.server.port=6333
+        # Define o nome do serviço no traefik
+        - traefik.http.routers.qdrant.service=qdrant
 
     configs:
       - source: qdrant_config
         target: /qdrant/config/production.yaml
-
 
 configs:
   qdrant_config:
